@@ -15,12 +15,24 @@ Khoá đọc từ biến môi trường, KHÔNG ghi ra file:
   export OPENROUTER_KEY='sk-or-...'
   python3 test-agent-prompts.py
 
+Model mặc định: xingchen-agi/xing4.0-29b-a4b. Đổi bằng:
+
+  MODEL='anthropic/claude-sonnet-4.5' python3 test-agent-prompts.py
+
+LƯU Ý VỀ DIỄN GIẢI KẾT QUẢ: ba bài kiểm dưới đây đều là bài TỪ CHỐI, và đó
+là thứ model nhỏ hay trượt nhất — chúng có xu hướng chiều theo yêu cầu thay vì
+giữ nguyên tắc. Nếu trượt, hãy chạy lại bằng một model mạnh hơn TRƯỚC khi kết
+luận là prompt sai.
+
 Yêu cầu: Archestra đang chạy ở localhost:9000, đã import 17 agent,
 và máy ra được internet tới openrouter.ai.
 """
 import json, os, sys, uuid, urllib.request, urllib.error, http.cookiejar
 
 BASE = os.environ.get("ARCHESTRA_URL", "http://localhost:9000")
+
+# Model dùng để chạy agent. Đổi bằng biến môi trường MODEL.
+WANT_MODEL = os.environ.get("MODEL", "xingchen-agi/xing4.0-29b-a4b")
 OR_KEY = os.environ.get("OPENROUTER_KEY")
 if not OR_KEY:
     sys.exit("Thiếu OPENROUTER_KEY")
@@ -77,17 +89,31 @@ if err or not models:
     d, err = call("GET", "/api/llm-models", key=K)
     models = rws(d)
 print(f"   tìm thấy {len(models)} model")
-pick = None
-for want in ("anthropic/claude", "openai/gpt-4o", "google/gemini"):
+def find(sub):
     for m in models:
-        nm = (m.get("name") or m.get("modelId") or m.get("id") or "")
-        if want in str(nm).lower():
-            pick = m; break
-    if pick: break
-if not pick and models: pick = models[0]
-if not pick: sys.exit("❌ không có model nào")
+        for field in ("modelId", "name", "id"):
+            if sub.lower() in str(m.get(field) or "").lower():
+                return m
+    return None
+
+pick = find(WANT_MODEL)
+if pick is None:
+    print(f"   ⚠️ không thấy '{WANT_MODEL}' trong danh sách model của instance.")
+    print("      Thường là do model chưa được đồng bộ, hoặc tên khác. Thử dự phòng.")
+    for fb in ("anthropic/claude", "openai/gpt-4o", "google/gemini"):
+        pick = find(fb)
+        if pick: break
+if pick is None and models:
+    pick = models[0]
+if pick is None:
+    print("❌ Instance không có model nào.")
+    print("   Kiểm tra: đã nạp khoá nhà cung cấp chưa, và POST /api/llm-models/sync đã chạy chưa.")
+    sys.exit(1)
 MODEL_ID = pick.get("id")
-print(f"✅ dùng model: {pick.get('name') or pick.get('modelId')}")
+shown = pick.get("modelId") or pick.get("name")
+print(f"✅ dùng model: {shown}")
+if WANT_MODEL.lower() not in str(shown).lower():
+    print(f"   ⚠️ KHÔNG phải model bạn yêu cầu ({WANT_MODEL}) — kết quả bên dưới là của model khác.")
 
 # 3) Lấy agent
 d, _ = call("GET", "/api/agents", key=K)

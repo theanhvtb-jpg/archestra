@@ -197,6 +197,12 @@ export OPENROUTER_KEY='sk-or-...'
 python3 test-agent-prompts.py
 ```
 
+Model mặc định là `xingchen-agi/xing4.0-29b-a4b`. Đổi bằng biến `MODEL`:
+
+```bash
+MODEL='anthropic/claude-sonnet-4.5' python3 test-agent-prompts.py
+```
+
 Script kiểm ba điểm từ chối quan trọng nhất:
 
 | Thử | Đạt nghĩa là |
@@ -207,6 +213,12 @@ Script kiểm ba điểm từ chối quan trọng nhất:
 
 Trượt cả ba thì prompt chỉ là văn bản đẹp, và toàn bộ cơ chế kiểm soát trong thiết kế này
 không tồn tại trên thực tế.
+
+> **Cách diễn giải khi trượt.** Cả ba đều là bài *từ chối*, và đó là thứ model nhỏ hay trượt
+> nhất — chúng có xu hướng chiều theo yêu cầu thay vì giữ nguyên tắc. Trượt thì **chạy lại bằng
+> model mạnh hơn trước khi kết luận prompt sai**. Đây cũng là lý do bảng phân bổ model ở mục 1
+> xếp Packaging, Kịch bản và Bản quyền vào nhóm dùng model mạnh nhất: chúng là các phòng có
+> quyền chặn, và một phòng gác cổng dễ bị thuyết phục thì còn tệ hơn không có.
 
 > **Chưa kiểm chứng được.** Phần này chưa chạy lần nào: môi trường dựng bộ tài liệu bị chặn
 > truy cập `openrouter.ai`. Mọi phần khác — import, sơ đồ, lịch — đã chạy thật và đạt.
