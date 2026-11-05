@@ -40,6 +40,35 @@ Archestra có sẵn cơ chế tối ưu chi phí ở `/llm/cost/optimization-rul
 
 ---
 
+## 1b. ⚠️ Hai phiên bản Archestra khác nhau về API
+
+**Đã kiểm chứng trên instance thật** (`archestra/platform:latest` = **v1.5.0-rc.22**, ngày
+2026-11-05) và đối chiếu với mã nguồn trong repo này. Hai bên **đã lệch nhau**:
+
+| Thứ | Trong repo | Trong image v1.5.0-rc.22 |
+|---|---|---|
+| Import agent | `POST /api/agents/import` | ✅ giống — **17/17 agent import được** |
+| Nối delegation | `POST /api/agents/:id/delegations` | ✅ giống — sơ đồ nối đúng |
+| Knowledge Base | `POST /api/knowledge-bases` | ✅ giống — 11/11 tạo được |
+| **Policy chặn tool** | `/api/autonomy-policies/tool-invocation`, mỗi tool một dòng | ❌ **không còn**. Thay bằng `/api/guardrails-policy`: MỘT tài liệu TOML cho cả tổ chức, gom quy tắc theo "battery" |
+| **Lịch định kỳ** | `POST /api/schedule-triggers` cần `agentId` | ⚠️ cần thêm **`projectId`** — lịch nay thuộc về một project |
+
+**Hệ quả thực tế:**
+
+- Toàn bộ **17 payload agent là portable** — chạy được trên cả hai. Đây là phần cốt lõi của
+  thiết kế và nó không phụ thuộc phiên bản.
+- `setup-rhythms.py` **đã sửa**: tự đọc OpenAPI để biết có cần `projectId` không, tự tạo
+  project nếu cần. Chạy được trên cả hai.
+- `setup-policies.py` **không dùng được trên v1.5**. Nó sẽ **dừng với mã lỗi 2 và in ra danh
+  sách quy tắc cần có** để bạn tự chuyển sang guardrails. Script bảo mật mà âm thầm không làm
+  gì là nguy hiểm hơn script báo lỗi, nên nó cố tình ồn ào.
+
+> **Chưa cài được guardrails thì đừng gán tool đăng cho agent.** Trên v1.5, cho tới khi bạn tự
+> dựng tài liệu guardrails tương đương, **không có gì chặn hành động đăng**. Giữ khâu đăng thủ
+> công — đúng như thiết kế vẫn khuyến nghị.
+
+Chạy `doctor.py` để biết instance của bạn thuộc phiên bản nào; nó tự phát hiện và nói rõ.
+
 ## 2. Địa chỉ Archestra
 
 Tuỳ cách bạn cài:
@@ -50,6 +79,24 @@ Tuỳ cách bạn cài:
 | Helm / Kubernetes | host bạn expose, cổng 9000 | host bạn expose, cổng 3000 |
 
 Script trong bộ tài liệu này mặc định `http://localhost:9000`, đổi bằng `--base-url`.
+
+### Đăng nhập lần đầu
+
+**Không đăng ký tài khoản mới được.** Archestra chặn đăng ký trực tiếp nếu không có lời mời.
+Thay vào đó có sẵn một tài khoản quản trị mặc định:
+
+```
+admin@example.com  /  password
+```
+
+Đổi bằng biến môi trường `ARCHESTRA_AUTH_ADMIN_EMAIL` và `ARCHESTRA_AUTH_ADMIN_PASSWORD`.
+
+> **Đổi mật khẩu này trước khi dùng thật.** `password` là mặc định công khai, ai cũng biết.
+
+Lưu ý: `ARCHESTRA_QUICKSTART=true` chỉ là cờ tính năng — nó **không** tạo tài khoản hay dữ liệu
+mẫu. Nó bật chế độ dựng cụm KinD để chạy MCP server, và cần Docker socket. Nếu môi trường của
+bạn không dựng được KinD, **bỏ cờ đó đi** thì nền tảng vẫn chạy bình thường với Postgres nội bộ,
+chỉ là tính năng chạy MCP server trên Kubernetes sẽ tắt.
 
 ### Tạo khoá API Archestra
 

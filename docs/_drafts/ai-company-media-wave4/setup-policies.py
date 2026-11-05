@@ -83,6 +83,28 @@ def main():
     if not key:
         sys.exit("Thiếu biến môi trường ARCHESTRA_API_KEY")
 
+    # Kiểm tra phiên bản API TRƯỚC khi làm gì khác.
+    # Từ v1.5, policy theo từng tool bị thay bằng một tài liệu guardrails duy nhất.
+    spec = call(a.base_url, key, "GET", "/openapi.json")
+    paths = (spec or {}).get("paths", {})
+    if "/api/autonomy-policies/tool-invocation" not in paths:
+        ver = (spec or {}).get("info", {}).get("version", "không rõ")
+        print(f"\n⛔ DỪNG — phiên bản Archestra này ({ver}) KHÔNG có API policy theo từng tool.\n")
+        print("   Script này viết cho mô hình cũ: mỗi tool một policy trong")
+        print("   /api/autonomy-policies/tool-invocation. Endpoint đó không còn tồn tại.\n")
+        if "/api/guardrails-policy" in paths:
+            print("   Phiên bản này dùng MỘT tài liệu guardrails (định dạng TOML) cho cả tổ chức:")
+            print("     GET  /api/guardrails-policy   — xem policy hiện tại")
+            print("     PUT  /api/guardrails-policy   — thay thế, cần {content, expectedRevision}")
+            print("   Nó gom quy tắc theo 'battery' thay vì theo từng tool, nên không")
+            print("   chuyển đổi tự động được từ danh sách RULES bên dưới.\n")
+        print("   ⚠️  KHÔNG CÓ POLICY NÀO ĐƯỢC CÀI. Đừng gán tool đăng cho agent")
+        print("       cho tới khi bạn tự dựng guardrails tương đương.\n")
+        print("   Các quy tắc cần có, để bạn chuyển thủ công:")
+        for r in RULES:
+            print(f"     · {r['action']:<34} {', '.join(r['match'][:3])}")
+        sys.exit(2)
+
     tools = call(a.base_url, key, "GET", "/api/tools")
     if not isinstance(tools, list):
         tools = tools.get("data", [])

@@ -157,7 +157,18 @@ def main():
     data, err = get(a.base_url, key, "/api/autonomy-policies/tool-invocation")
     print(f"\n{'─'*62}\nPOLICY CHẶN\n{'─'*62}")
     chua_co_policy = False
-    if err:
+    if err and "404" in err:
+        spec, _ = get(a.base_url, key, "/openapi.json")
+        ver = ((spec or {}).get("info") or {}).get("version", "không rõ")
+        co_guardrails = "/api/guardrails-policy" in ((spec or {}).get("paths") or {})
+        print(f"  ⚠️ Phiên bản này ({ver}) không có policy theo từng tool.")
+        if co_guardrails:
+            print("     Nó dùng MỘT tài liệu guardrails cho cả tổ chức:")
+            print("       GET/PUT /api/guardrails-policy  (định dạng TOML, theo 'battery')")
+            print("     setup-policies.py KHÔNG dùng được ở đây — nó sẽ dừng và báo rõ.")
+        print("     ⚠️ Chưa có gì chặn hành động đăng. Đừng gán tool đăng cho agent")
+        print("        cho tới khi bạn dựng guardrails tương đương.")
+    elif err:
         print(f"  ⚠️ không đọc được: {err}")
     else:
         pol = rows(data)

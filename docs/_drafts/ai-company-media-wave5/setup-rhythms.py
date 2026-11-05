@@ -45,6 +45,20 @@ RHYTHMS = [
 ]
 
 
+def _schedule_needs_project(base, key):
+    """v1.5+ bắt buộc projectId khi tạo schedule trigger; bản cũ thì không.
+    Đọc OpenAPI thay vì đoán theo số phiên bản."""
+    try:
+        spec = call(base, key, "GET", "/openapi.json")
+        schema = (spec["paths"]["/api/schedule-triggers"]["post"]["requestBody"]
+                  ["content"]["application/json"]["schema"])
+        if "$ref" in schema:
+            schema = spec["components"]["schemas"][schema["$ref"].split("/")[-1]]
+        return "projectId" in (schema.get("required") or [])
+    except Exception:
+        return False
+
+
 def call(base, key, method, path, payload=None):
     req = urllib.request.Request(base.rstrip("/") + path,
                                  data=json.dumps(payload).encode() if payload is not None else None,
@@ -65,6 +79,8 @@ def main():
     p.add_argument("--tz", default="Asia/Ho_Chi_Minh",
                    help="Múi giờ chạy lịch, ví dụ Asia/Ho_Chi_Minh hoặc America/New_York")
     p.add_argument("--apply", action="store_true")
+    p.add_argument("--project", default="Studio YouTube",
+                   help="Tên project chứa các lịch (chỉ dùng với Archestra v1.5 trở lên)")
     a = p.parse_args()
 
     key = os.environ.get("ARCHESTRA_API_KEY")
@@ -76,15 +92,35 @@ def main():
         agents = agents.get("data", [])
     by_name = {ag["name"]: ag["id"] for ag in agents if ag.get("agentType") == "agent"}
 
+    # Từ v1.5 trở đi, schedule trigger thuộc về một project. Phiên bản cũ thì không.
+    need_project = _schedule_needs_project(a.base_url, key)
+    project_id = None
+    if need_project:
+        projects = call(a.base_url, key, "GET", "/api/projects")
+        rows_ = projects if isinstance(projects, list) else projects.get("data", [])
+        match = [x for x in rows_ if x.get("name") == a.project]
+        if match:
+            project_id = match[0]["id"]
+            print(f"Dùng project sẵn có: {a.project}\n")
+        elif a.apply:
+            created = call(a.base_url, key, "POST", "/api/projects", {"name": a.project})
+            project_id = created.get("id")
+            print(f"Đã tạo project: {a.project}\n")
+        else:
+            print(f"Phiên bản này gắn lịch vào project. Sẽ tạo project '{a.project}'.\n")
+
     planned, missing = [], []
     for name, agent_name, cron, msg in RHYTHMS:
         aid = by_name.get(agent_name)
         if not aid:
             missing.append((name, agent_name))
             continue
-        planned.append({"name": name, "agentId": aid, "messageTemplate": msg,
-                        "cronExpression": cron, "timezone": a.tz, "enabled": True,
-                        "_agentName": agent_name})
+        item = {"name": name, "agentId": aid, "messageTemplate": msg,
+                "cronExpression": cron, "timezone": a.tz, "enabled": True,
+                "_agentName": agent_name}
+        if need_project:
+            item["projectId"] = project_id
+        planned.append(item)
 
     if missing:
         print("KHÔNG TÌM THẤY AGENT — bỏ qua các nhịp sau:")
