@@ -52,6 +52,7 @@ thấp thì rẻ; dựng sau khi đã tăng tốc thì luôn bị coi là cản 
 | `wire-org.py` | wave5 | Nối cả sơ đồ CEO → giám đốc → phòng |
 | `setup-rhythms.py` | wave5 | Tạo 7 nhịp vận hành định kỳ |
 | `doctor.py` | `_drafts/` | **Chạy đầu tiên** — kiểm tra hiện trạng, chỉ đọc |
+| `test-agent-prompts.py` | `_drafts/` | Kiểm thử agent có **từ chối đúng chỗ** không (cần khoá LLM) |
 
 Bốn script đầu **mặc định dry-run**, phải thêm `--apply` mới thực thi. `doctor.py` chỉ đọc,
 không bao giờ thay đổi gì — chạy nó trước tiên để biết đang thiếu gì.
