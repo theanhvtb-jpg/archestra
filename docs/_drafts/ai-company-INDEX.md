@@ -11,7 +11,8 @@ và khoá kỹ thuật trên mọi hành động không thể hoàn tác.
 
 | # | Tài liệu | Nội dung |
 |---|---|---|
-| 0 | [Chuẩn bị hạ tầng](./ai-company-media-SETUP.md) | Khoá API, địa chỉ, cần bao nhiêu tool |
+| 0 | [**Chạy trên macOS**](./CHAY-TREN-MAC.md) | Từ số không tới 17 agent, từng bước |
+| 0b | [Chuẩn bị hạ tầng](./ai-company-media-SETUP.md) | Khoá API, địa chỉ, cần bao nhiêu tool |
 | 1 | [Nguyên tắc nền](./ai-company-multi-department.md) | Năm nguyên tắc, cách ánh xạ vào Archestra, rủi ro chung |
 | 2 | [Thiết kế cho studio YouTube](./ai-company-youtube-media.md) | 11 phòng, 7 cổng, 10 quy trình, rủi ro ngành |
 | 3 | [Đợt 0 — ba agent đầu](./ai-company-media-phase0/README.md) | Nghiên cứu, Packaging, CEO |
@@ -51,7 +52,8 @@ thấp thì rẻ; dựng sau khi đã tăng tốc thì luôn bị coi là cản 
 | `setup-policies.py` | wave4 | Cài khoá kỹ thuật trên tool đăng/xoá/gửi |
 | `wire-org.py` | wave5 | Nối cả sơ đồ CEO → giám đốc → phòng |
 | `setup-rhythms.py` | wave5 | Tạo 7 nhịp vận hành định kỳ |
-| `doctor.py` | `_drafts/` | **Chạy đầu tiên** — kiểm tra hiện trạng, chỉ đọc |
+| `bootstrap.py` | `_drafts/` | **Dựng cả công ty bằng một lệnh** — KB, 17 agent, sơ đồ |
+| `doctor.py` | `_drafts/` | Kiểm tra hiện trạng, chỉ đọc |
 | `test-agent-prompts.py` | `_drafts/` | Kiểm thử agent có **từ chối đúng chỗ** không (cần khoá LLM) |
 
 Bốn script đầu **mặc định dry-run**, phải thêm `--apply` mới thực thi. `doctor.py` chỉ đọc,
