@@ -11,6 +11,7 @@ và khoá kỹ thuật trên mọi hành động không thể hoàn tác.
 
 | # | Tài liệu | Nội dung |
 |---|---|---|
+| 0 | [Chuẩn bị hạ tầng](./ai-company-media-SETUP.md) | Khoá API, địa chỉ, cần bao nhiêu tool |
 | 1 | [Nguyên tắc nền](./ai-company-multi-department.md) | Năm nguyên tắc, cách ánh xạ vào Archestra, rủi ro chung |
 | 2 | [Thiết kế cho studio YouTube](./ai-company-youtube-media.md) | 11 phòng, 7 cổng, 10 quy trình, rủi ro ngành |
 | 3 | [Đợt 0 — ba agent đầu](./ai-company-media-phase0/README.md) | Nghiên cứu, Packaging, CEO |

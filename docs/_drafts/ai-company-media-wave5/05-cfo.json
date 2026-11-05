@@ -35,8 +35,12 @@
   ],
   "tools": [
     {
-      "toolName": "THAY_BANG_TOOL_THAT__thong_ke_chi_phi",
-      "catalogName": "THAY_BANG_TEN_MCP_CATALOG"
+      "toolName": "archestra__get_agent_token_usage",
+      "catalogName": null
+    },
+    {
+      "toolName": "archestra__get_limits",
+      "catalogName": null
     }
   ],
   "delegations": [],
