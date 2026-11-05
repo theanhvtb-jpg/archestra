@@ -126,6 +126,14 @@ CEO mất khả năng gọi phòng đó.
 Đặt cost limit cho hai agent mới. Phòng Bản quyền sẽ tốn hơn các phòng khác vì prompt dài và
 phải đọc nhiều tài liệu — đó là chi phí đáng trả, nhưng vẫn nên có trần.
 
+## Khi sổ này được dùng tới thật
+
+Sổ đăng ký tài sản trông như việc giấy tờ cho tới lúc có sự cố. Khi kênh nhận khiếu nại, nó trả
+lời hai câu quyết định phương án xử lý: *tư liệu này có giấy phép không*, và *nó đã dùng ở những
+video nào khác*. Không có sổ thì bạn không có cơ sở làm gì ngoài chấp nhận.
+
+Quy trình đầy đủ: [QT-08 — xử lý sự cố bản quyền](../ai-company-media-qt08/README.md).
+
 ## Nghiệm thu
 
 - [ ] Đưa Bản quyền một kịch bản dùng nhạc không rõ nguồn → kết luận **KHÔNG ĐẠT**, không phải

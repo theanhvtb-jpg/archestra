@@ -162,6 +162,5 @@ Những thứ này chưa dựng, và cố ý chưa dựng — chỉ làm khi th�
 - **Kênh thứ hai.** Dùng lại toàn bộ agent, chỉ tạo bộ KB mới. Đó là lý do định dạng nằm trong
   KB chứ không nằm trong prompt.
 - **Phòng Kinh doanh** (tài trợ, affiliate) khi kênh đủ lớn.
-- **Quy trình xử lý sự cố bản quyền** — xem QT-08 trong
-  [thiết kế gốc](../ai-company-youtube-media.md#5-mười-quy-trình-cần-có). Nên diễn tập một lần
-  trước khi cần tới nó thật.
+Quy trình xử lý sự cố bản quyền (QT-08) **đã viết xong**:
+[tại đây](../ai-company-media-qt08/README.md). Nên diễn tập một lần trước khi cần tới nó thật.

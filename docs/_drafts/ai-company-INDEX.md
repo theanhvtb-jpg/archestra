@@ -18,6 +18,7 @@ và khoá kỹ thuật trên mọi hành động không thể hoàn tác.
 | 5 | [Đợt 3 — dây chuyền](./ai-company-media-wave3/README.md) | Kịch bản, Bản địa hoá, Hậu kỳ, Tái sử dụng |
 | 6 | [Đợt 4 — vòng phản hồi](./ai-company-media-wave4/README.md) | Xuất bản, Phân tích, Cộng đồng, **policy** |
 | 7 | [Đợt 5 — tầng giám đốc](./ai-company-media-wave5/README.md) | 5 giám đốc, nhịp vận hành |
+| 8 | [QT-08 — xử lý sự cố bản quyền](./ai-company-media-qt08/README.md) | Quy trình khi nhận khiếu nại hoặc cảnh cáo |
 
 > Không có "Đợt 1". Đánh số theo các đợt trong lộ trình gốc, và đợt đầu tiên gọi là Đợt 0 vì nó
 > là bước chạy thử chứ chưa phải sản xuất thật.
@@ -63,6 +64,21 @@ mảng `warnings` là cách phổ biến nhất để kết thúc với agent r�
 
 **Thứ tự import có ý nghĩa.** Agent được tham chiếu phải tồn tại trước. Phòng ban trước giám đốc,
 giám đốc trước CEO.
+
+## Khi có sự cố
+
+[QT-08](./ai-company-media-qt08/README.md) là quy trình dùng khi kênh nhận khiếu nại, cảnh cáo
+hoặc yêu cầu gỡ bỏ. Ba điều quan trọng nhất trong đó:
+
+1. **Phân loại trước.** Nhầm khiếu nại thường với cảnh cáo vi phạm là lỗi phổ biến nhất, và
+   hoảng loạn với loại nhẹ gây hại nhiều hơn chính sự cố.
+2. **Đừng phản đối cho bõ tức.** Phản đối một yêu cầu gỡ bỏ là một bước pháp lý, không phải một
+   nút bấm. Chỉ phản đối khi sổ đăng ký tài sản chứng minh được giấy phép.
+3. **Truy vết ngược.** Một tư liệu có vấn đề hiếm khi chỉ nằm ở một video. Đây là bước hay bị bỏ
+   quên nhất và tốn kém nhất khi bỏ quên.
+
+**Diễn tập một lần mỗi quý, khi chưa có sự cố.** Quy trình chưa từng chạy thì không phải quy
+trình, chỉ là tài liệu.
 
 ## Ba thứ con người giữ, và nên giữ mãi
 
