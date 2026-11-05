@@ -51,8 +51,10 @@ thấp thì rẻ; dựng sau khi đã tăng tốc thì luôn bị coi là cản 
 | `setup-policies.py` | wave4 | Cài khoá kỹ thuật trên tool đăng/xoá/gửi |
 | `wire-org.py` | wave5 | Nối cả sơ đồ CEO → giám đốc → phòng |
 | `setup-rhythms.py` | wave5 | Tạo 7 nhịp vận hành định kỳ |
+| `doctor.py` | `_drafts/` | **Chạy đầu tiên** — kiểm tra hiện trạng, chỉ đọc |
 
-Cả bốn đều **mặc định dry-run**, phải thêm `--apply` mới thực thi.
+Bốn script đầu **mặc định dry-run**, phải thêm `--apply` mới thực thi. `doctor.py` chỉ đọc,
+không bao giờ thay đổi gì — chạy nó trước tiên để biết đang thiếu gì.
 
 ## Ba cái bẫy đã gặp, ghi lại để khỏi vấp
 
