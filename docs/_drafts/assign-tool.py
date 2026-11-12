@@ -164,15 +164,50 @@ def main():
         print("\nChạy lại với --apply để thực thi.")
         return
 
+    # Tool của MCP server chạy nội bộ cần biết DÙNG BẢN CÀI NÀO.
+    # Một server có thể có nhiều bản cài (riêng bạn / dùng chung nhóm).
+    installs = []
+    d, err = call(a.base_url, key, "GET", "/api/mcp_server")
+    if not err:
+        installs = rows(d)
+
+    def install_for(tool_name):
+        """Đoán bản cài theo tiền tố tên tool, ví dụ duckduckgo__search -> duckduckgo."""
+        prefix = (tool_name or "").split("__")[0].lower()
+        if not prefix:
+            return None
+        for inst in installs:
+            hay = " ".join(str(inst.get(k) or "") for k in ("name", "catalogName", "slug")).lower()
+            if prefix in hay or hay.replace("-", "") .find(prefix.replace("-", "")) >= 0:
+                return inst.get("id")
+        return None
+
     print()
     done = 0
     for t in match:
-        _, err = call(a.base_url, key, "POST", f"/api/agents/{target['id']}/tools/{t['id']}", {})
-        if err:
-            print(f"  ❌ {t.get('name')}: {err[:160]}")
+        name = t.get("name")
+        path = f"/api/agents/{target['id']}/tools/{t['id']}"
+        attempts = [("mặc định", {})]
+        inst_id = install_for(name)
+        if inst_id:
+            attempts.append(("gắn bản cài", {"mcpServerId": inst_id}))
+        attempts.append(("giải quyết lúc gọi", {"resolveAtCallTime": True}))
+
+        last = None
+        for label, body in attempts:
+            _, err = call(a.base_url, key, "POST", path, body)
+            if not err:
+                done += 1
+                extra = "" if label == "mặc định" else f"  ({label})"
+                print(f"  ✅ {name}{extra}")
+                break
+            last = err
         else:
-            done += 1
-            print(f"  ✅ {t.get('name')}")
+            print(f"  ❌ {name}")
+            print(f"       {last[:200]}")
+            if "installation" in (last or ""):
+                print("       Server này chạy nội bộ và cần chỉ rõ bản cài.")
+                print("       Thử gán trong giao diện: trang MCP server -> nút Connect.")
 
     print(f"\nĐã gán {done}/{len(match)} tool.")
     print("Kiểm chứng: mở chat với agent đó và bảo nó dùng tool — nó phải gọi được.")
