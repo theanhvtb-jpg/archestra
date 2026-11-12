@@ -57,6 +57,36 @@ def rows(data):
     return []
 
 
+def _auto_key(base):  # AUTO_KEY_MARKER
+    """Không có ARCHESTRA_API_KEY thì tự đăng nhập bằng tài khoản quản trị
+    và tạo khoá. Bỏ hẳn bước copy-dán khoá, vốn là chỗ hay vấp nhất."""
+    import http.cookiejar, json as _j, os as _o, sys as _s, urllib.request as _u, uuid as _uu
+    email = _o.environ.get("ARCHESTRA_ADMIN_EMAIL", "admin@example.com")
+    pw = _o.environ.get("ARCHESTRA_ADMIN_PASSWORD", "password")
+    cj = http.cookiejar.CookieJar()
+    op = _u.build_opener(_u.HTTPCookieProcessor(cj))
+    def post(path, payload):
+        r = _u.Request(base.rstrip("/") + path, data=_j.dumps(payload).encode(), method="POST")
+        r.add_header("Content-Type", "application/json")
+        return _j.loads(op.open(r, timeout=60).read() or b"{}")
+    try:
+        post("/api/auth/sign-in/email", {"email": email, "password": pw})
+    except Exception:
+        _s.exit("Không đăng nhập được để tự lấy khoá.\n"
+                f"  Đã thử: {email}\n"
+                "  Nếu bạn đã đổi mật khẩu, chạy lại kèm mật khẩu:\n"
+                "    ARCHESTRA_ADMIN_PASSWORD='mật-khẩu' python3 " + _o.path.basename(_s.argv[0]) + " ...\n"
+                "  Hoặc đặt khoá sẵn: export ARCHESTRA_API_KEY='arch_...'")
+    try:
+        k = post("/api/api-keys", {"name": "auto-" + _uu.uuid4().hex[:6]}).get("key")
+    except Exception as e:
+        _s.exit(f"Đăng nhập được nhưng không tạo được khoá: {e}")
+    if not k:
+        _s.exit("Không tạo được khoá API.")
+    print(f"(tự tạo khoá API: {k[:14]}...)\n")
+    return k
+
+
 def _check_key(k):  # CHECK_KEY_MARKER
     """Khoá API phải là ASCII — header HTTP không chứa được tiếng Việt."""
     import sys as _s
@@ -83,7 +113,8 @@ def main():
     p.add_argument("--base-url", default="http://localhost:9000")
     a = p.parse_args()
 
-    key = _check_key(os.environ.get("ARCHESTRA_API_KEY"))
+    key = os.environ.get("ARCHESTRA_API_KEY")
+    key = _check_key(key) if key else _auto_key(a.base_url)
 
     print("=" * 62)
     print(f"KIỂM TRA ARCHESTRA — {a.base_url}")
