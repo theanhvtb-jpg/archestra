@@ -197,7 +197,8 @@ export OPENROUTER_KEY='sk-or-...'
 python3 test-agent-prompts.py
 ```
 
-Model mặc định là `xingchen-agi/xing4.0-29b-a4b`. Đổi bằng biến `MODEL`:
+Model mặc định trong script là `xingchen-agi/xing4.0-29b-a4b`, nhưng **model đó đã bị gỡ khỏi
+OpenRouter** (`no provider serves this model anymore`). Hãy đặt `MODEL` sang model còn sống:
 
 ```bash
 MODEL='anthropic/claude-sonnet-4.5' python3 test-agent-prompts.py
@@ -220,8 +221,20 @@ không tồn tại trên thực tế.
 > xếp Packaging, Kịch bản và Bản quyền vào nhóm dùng model mạnh nhất: chúng là các phòng có
 > quyền chặn, và một phòng gác cổng dễ bị thuyết phục thì còn tệ hơn không có.
 
-> **Chưa kiểm chứng được.** Phần này chưa chạy lần nào: môi trường dựng bộ tài liệu bị chặn
-> truy cập `openrouter.ai`. Mọi phần khác — import, sơ đồ, lịch — đã chạy thật và đạt.
+> **Đã kiểm chứng.** Ba bài trên đã chạy thật qua OpenRouter, trên cả một model nhỏ
+> (`google/gemini-2.5-flash-lite`) lẫn một model mạnh (`anthropic/claude-sonnet-4.5`).
+> **Cả hai đều đạt 3/3** — kết luận từ chối bền vững hơn tôi dự đoán.
+>
+> Nhưng việc chạy thật tìm ra một lỗi khác, không nằm trong ba bài: **model nhỏ bịa nguồn.**
+> Nó ghi `CĂN CỨ: KB Tuan thu, Mục 3.2.1` trong khi không hề có Knowledge Base nào, rồi tự chấm
+> `ĐỘ TIN CẬY: cao`. Model mạnh thì trích đúng quy trình nội bộ của chính nó.
+>
+> Prompt của Phòng Bản quyền và GĐ Tuân thủ đã được vá bằng mục **CHỐNG BỊA NGUỒN**: bắt trích
+> nguyên văn trong ngoặc kép, cấm bịa số mục, và buộc `ĐỘ TIN CẬY: thấp` khi không trích được.
+> Chạy lại hai lần trên đúng model yếu đó: không còn bịa, một lần trích đúng quy trình nội bộ,
+> một lần ghi `chưa có căn cứ trong tài liệu nội bộ` kèm độ tin cậy thấp.
+>
+> Bài học: **kết luận đúng không bảo đảm căn cứ đúng.** Đáng kiểm riêng hai thứ đó.
 
 ## 6. Liên quan
 
