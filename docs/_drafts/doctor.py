@@ -57,16 +57,33 @@ def rows(data):
     return []
 
 
+def _check_key(k):  # CHECK_KEY_MARKER
+    """Khoá API phải là ASCII — header HTTP không chứa được tiếng Việt."""
+    import sys as _s
+    if not k:
+        _s.exit("Thiếu ARCHESTRA_API_KEY.\n"
+                "  Lấy khoá: chạy 'python3 bootstrap.py --apply' (nó in ra khoá mới),\n"
+                "  hoặc giao diện -> Settings -> API Keys.\n"
+                "  Rồi: export ARCHESTRA_API_KEY='arch_...'")
+    try:
+        k.encode("ascii")
+    except UnicodeEncodeError:
+        _s.exit("ARCHESTRA_API_KEY chứa ký tự tiếng Việt.\n"
+                "  Có vẻ bạn đã dán chỗ trống ví dụ thay vì khoá thật.\n"
+                "  Khoá thật luôn bắt đầu bằng 'arch_'.\n"
+                "  Chạy 'python3 bootstrap.py --apply' rồi copy nguyên dòng\n"
+                "  export ARCHESTRA_API_KEY='arch_...' mà nó in ra.")
+    if not k.startswith("arch_"):
+        print("⚠️  Khoá không bắt đầu bằng 'arch_' — có thể sai khoá.\n")
+    return k
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--base-url", default="http://localhost:9000")
     a = p.parse_args()
 
-    key = os.environ.get("ARCHESTRA_API_KEY")
-    if not key:
-        sys.exit("Thiếu ARCHESTRA_API_KEY.\n"
-                 "  Lấy tại: giao diện -> Settings -> API Keys\n"
-                 "  Rồi: export ARCHESTRA_API_KEY='khoa-cua-ban'")
+    key = _check_key(os.environ.get("ARCHESTRA_API_KEY"))
 
     print("=" * 62)
     print(f"KIỂM TRA ARCHESTRA — {a.base_url}")

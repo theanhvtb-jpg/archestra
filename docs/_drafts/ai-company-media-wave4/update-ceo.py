@@ -11,6 +11,28 @@ Dùng:
 """
 import argparse, json, os, sys, urllib.request
 
+def _check_key(k):  # CHECK_KEY_MARKER
+    """Khoá API phải là ASCII — header HTTP không chứa được tiếng Việt."""
+    import sys as _s
+    if not k:
+        _s.exit("Thiếu ARCHESTRA_API_KEY.\n"
+                "  Lấy khoá: chạy 'python3 bootstrap.py --apply' (nó in ra khoá mới),\n"
+                "  hoặc giao diện -> Settings -> API Keys.\n"
+                "  Rồi: export ARCHESTRA_API_KEY='arch_...'")
+    try:
+        k.encode("ascii")
+    except UnicodeEncodeError:
+        _s.exit("ARCHESTRA_API_KEY chứa ký tự tiếng Việt.\n"
+                "  Có vẻ bạn đã dán chỗ trống ví dụ thay vì khoá thật.\n"
+                "  Khoá thật luôn bắt đầu bằng 'arch_'.\n"
+                "  Chạy 'python3 bootstrap.py --apply' rồi copy nguyên dòng\n"
+                "  export ARCHESTRA_API_KEY='arch_...' mà nó in ra.")
+    if not k.startswith("arch_"):
+        print("⚠️  Khoá không bắt đầu bằng 'arch_' — có thể sai khoá.\n")
+    return k
+
+
+
 def call(base, key, method, path, payload=None):
     url = base.rstrip("/") + path
     data = json.dumps(payload).encode() if payload is not None else None
@@ -31,7 +53,7 @@ p.add_argument("--target-id", action="append", default=[], help="ID phòng ban, 
 p.add_argument("--prompt-file", default="03-ceo-prompt-v2.txt")
 a = p.parse_args()
 
-key = os.environ.get("ARCHESTRA_API_KEY")
+key = _check_key(os.environ.get("ARCHESTRA_API_KEY"))
 if not key:
     sys.exit("Thiếu biến môi trường ARCHESTRA_API_KEY")
 if not a.target_id:
