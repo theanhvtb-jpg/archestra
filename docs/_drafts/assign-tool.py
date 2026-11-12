@@ -62,12 +62,26 @@ def main():
     agents = [x for x in rows(agents) if x.get("agentType") == "agent"]
 
     if a.list or not (a.tool and a.agent):
-        ext = [t for t in tools if not (t.get("name") or "").startswith("archestra__")]
-        print(f"TOOL TỪ MCP SERVER NGOÀI ({len(ext)}):")
-        for t in sorted(ext, key=lambda x: x.get("name") or ""):
+        def kind(t):
+            n = t.get("name") or ""
+            if n.startswith("agent__"): return "deleg"
+            if n.startswith("archestra__"): return "builtin"
+            return "mcp"
+        mcp = [t for t in tools if kind(t) == "mcp"]
+        builtin = [t for t in tools if kind(t) == "builtin"]
+        deleg = [t for t in tools if kind(t) == "deleg"]
+
+        print(f"TOOL TỪ MCP SERVER ({len(mcp)}) — đây là thứ bạn gán:")
+        for t in sorted(mcp, key=lambda x: x.get("name") or ""):
             print(f"  · {t.get('name')}")
-        if not ext:
+        if not mcp:
             print("  (chưa có — cài MCP server ở /mcp/registry trước)")
+        if builtin:
+            print(f"\nTOOL CÓ SẴN CỦA ARCHESTRA ({len(builtin)}):")
+            for t in sorted(builtin, key=lambda x: x.get("name") or "")[:8]:
+                print(f"  · {t.get('name')}")
+        if deleg:
+            print(f"\n({len(deleg)} tool uỷ quyền agent__* là sơ đồ tổ chức — không gán tay)")
         print(f"\nAGENT ({len(agents)}):")
         for x in sorted(agents, key=lambda y: y.get("name") or ""):
             print(f"  · {x.get('name')}")
@@ -83,6 +97,12 @@ def main():
         sys.exit(1)
 
     match = [t for t in tools if a.tool.lower() in (t.get("name") or "").lower()]
+    deleg_hit = [t for t in match if (t.get("name") or "").startswith("agent__")]
+    if deleg_hit and len(deleg_hit) == len(match):
+        print(f"⚠️  '{a.tool}' chỉ khớp tool uỷ quyền (agent__*), vốn là sơ đồ tổ chức.")
+        print("   Dùng wire-org.py để sửa sơ đồ, không gán tay ở đây.")
+        sys.exit(1)
+    match = [t for t in match if not (t.get("name") or "").startswith("agent__")]
     if not match:
         print(f"❌ Không thấy tool nào khớp '{a.tool}'. Chạy --list để xem danh sách.")
         sys.exit(1)
