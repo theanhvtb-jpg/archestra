@@ -33,6 +33,20 @@ ORG = {
 }
 
 
+def _resolve(path):
+    """Tìm file theo thư mục đang đứng, rồi theo thư mục chứa script.
+    Không ép người dùng phải cd vào đúng thư mục mới chạy được."""
+    import os as _o, sys as _s
+    if _o.path.isfile(path):
+        return _o.path.abspath(path)
+    here = _o.path.join(_o.path.dirname(_o.path.abspath(__file__)), _o.path.basename(path))
+    if _o.path.isfile(here):
+        return here
+    _s.exit(f"Không thấy file prompt: {path}\n"
+            f"  Đã tìm ở: {_o.path.abspath(path)}\n"
+            f"           {here}")
+
+
 def call(base, key, method, path, payload=None):
     req = urllib.request.Request(base.rstrip("/") + path,
                                  data=json.dumps(payload).encode() if payload is not None else None,
@@ -125,7 +139,11 @@ def main():
         print()
 
     if a.ceo_prompt:
-        print(f"  + Cập nhật system prompt của CEO từ: {a.ceo_prompt}\n")
+        try:
+            _resolve(a.ceo_prompt)
+        except SystemExit:
+            raise
+        print(f"  + Cập nhật system prompt của CEO từ: {_resolve(a.ceo_prompt)}\n")
 
     if not a.apply:
         print("Chạy lại với --apply để thực thi.")
@@ -137,7 +155,7 @@ def main():
         sys.exit(1)
 
     if a.ceo_prompt:
-        prompt = open(a.ceo_prompt, encoding="utf-8").read()
+        prompt = open(_resolve(a.ceo_prompt), encoding="utf-8").read()
         call(a.base_url, key, "PUT", f"/api/agents/{by_name['CEO Agent Media']}",
              {"systemPrompt": prompt})
         print(f"✓ Đã cập nhật prompt CEO ({len(prompt)} ký tự)")
