@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Nạp lại agent sau khi sửa prompt: xoá bản cũ -> import bản mới -> nối lại sơ đồ.
+"""Cập nhật prompt của agent từ file payload, TẠI CHỖ.
 
-Import của Archestra LUÔN tạo agent mới, không ghi đè. Nên muốn cập nhật prompt
-thì phải xoá bản cũ trước, nếu không sẽ có hai bản trùng tên.
-Và xoá agent là mất mọi liên kết uỷ quyền của nó, nên phải nối lại sơ đồ.
+Sửa prompt KHÔNG cần xoá agent. Xoá rồi import lại là cách sai: nó bỏ lại tool
+uỷ quyền mồ côi (agent__*) khiến việc nối lại sơ đồ đụng lỗi 409, và làm mất
+mọi tool đã gán cho agent đó.
+
+Script này gửi PUT lên agent đang có, nên ID, liên kết uỷ quyền và tool giữ nguyên.
+Agent chưa tồn tại thì mới import mới.
 
   python3 reimport-agent.py --agent "Phong Ban quyen & Chinh sach"
   python3 reimport-agent.py --agent "GD Tuan thu" --agent "Phong Ban quyen & Chinh sach" --apply
@@ -79,13 +82,12 @@ def main():
     p.add_argument("--base-url", default="http://localhost:9000")
     p.add_argument("--agent", action="append", default=[], required=True,
                    help="Tên agent cần nạp lại. Lặp lại để làm nhiều agent.")
-    p.add_argument("--skip-wire", action="store_true", help="Không nối lại sơ đồ sau khi import")
     p.add_argument("--apply", action="store_true")
     a = p.parse_args()
     B = a.base_url
 
     print("=" * 62)
-    print("NẠP LẠI AGENT" + ("" if a.apply else "  —  XEM TRƯỚC (chưa thay đổi gì)"))
+    print("CẬP NHẬT PROMPT AGENT" + ("" if a.apply else "  —  XEM TRƯỚC (chưa thay đổi gì)"))
     print("=" * 62)
 
     key = get_key(B)
@@ -104,52 +106,45 @@ def main():
 
     print("Sẽ làm:")
     for name, f, old_id in plan:
-        state = "xoá rồi import lại" if old_id else "chưa có — chỉ import"
+        state = "cập nhật prompt tại chỗ" if old_id else "chưa có — import mới"
         print(f"  · {name}")
         print(f"      từ file : {os.path.relpath(f, HERE)}")
         print(f"      thao tác: {state}")
-    if not a.skip_wire:
-        print("\n  · Nối lại toàn bộ sơ đồ tổ chức (wire-org.py)")
-        print("    — bắt buộc, vì xoá agent làm mất mọi liên kết uỷ quyền của nó")
+    print("\n  Liên kết uỷ quyền và tool đã gán được giữ nguyên.")
 
     if not a.apply:
         print("\nChạy lại với --apply để thực thi.")
         return
 
     print()
+    done = 0
     for name, f, old_id in plan:
-        if old_id:
-            _, err = call(B, "DELETE", f"/api/agents/{old_id}", key=key)
-            if err:
-                print(f"  ❌ không xoá được '{name}': {err[:140]}")
-                continue
-            print(f"  🗑  đã xoá bản cũ: {name}")
         payload = json.load(open(f, encoding="utf-8"))
-        d, err = call(B, "POST", "/api/agents/import", payload, key=key)
-        if err:
-            print(f"  ❌ import '{name}' thất bại: {err[:140]}")
-            continue
-        warns = (d or {}).get("warnings") or []
-        print(f"  ✅ đã import: {name}" + (f"  ({len(warns)} warning)" if warns else ""))
+        ag = payload["agent"]
+        if old_id:
+            # Cập nhật TẠI CHỖ. Giữ nguyên ID, liên kết uỷ quyền và tool đã gán.
+            body = {"systemPrompt": ag.get("systemPrompt"),
+                    "description": ag.get("description"),
+                    "icon": ag.get("icon")}
+            body = {k: v for k, v in body.items() if v is not None}
+            _, err = call(B, "PUT", f"/api/agents/{old_id}", body, key=key)
+            if err:
+                print(f"  ❌ {name}: {err[:160]}")
+                continue
+            done += 1
+            print(f"  ✅ đã cập nhật tại chỗ: {name}  ({len(ag.get('systemPrompt') or '')} ký tự)")
+        else:
+            d, err = call(B, "POST", "/api/agents/import", payload, key=key)
+            if err:
+                print(f"  ❌ import '{name}' thất bại: {err[:160]}")
+                continue
+            done += 1
+            warns = (d or {}).get("warnings") or []
+            print(f"  ✅ đã import mới: {name}" + (f"  ({len(warns)} warning)" if warns else ""))
 
-    if a.skip_wire:
-        print("\n⚠️  Bỏ qua nối sơ đồ — nhớ chạy wire-org.py --apply, nếu không agent vừa nạp sẽ mồ côi.")
-        return
-
-    print("\nNối lại sơ đồ tổ chức:")
-    wire = os.path.join(HERE, "ai-company-media-wave5", "wire-org.py")
-    env = dict(os.environ, ARCHESTRA_API_KEY=key)
-    r = subprocess.run([sys.executable, "-I", wire, "--base-url", B, "--apply",
-                        "--ceo-prompt", "06-ceo-prompt-v5.txt"],
-                       cwd=os.path.dirname(wire), env=env, capture_output=True, text=True)
-    for line in r.stdout.splitlines():
-        if line.startswith("✓") or "⚠️" in line or "DỪNG" in line:
-            print(f"  {line}")
-    if r.returncode != 0:
-        print(f"  ❌ wire-org.py lỗi:\n{(r.stderr or r.stdout)[-400:]}")
-        sys.exit(1)
-
-    print("\nXong. Kiểm chứng: Agents trong giao diện — cột Subagents của CEO phải là 5.")
+    print(f"\nXong {done}/{len(plan)} agent.")
+    print("Liên kết uỷ quyền và tool đã gán được giữ nguyên — không cần nối lại sơ đồ.")
+    print("Kiểm chứng: Agents trong giao diện, cột Subagents của CEO vẫn phải là 5.")
 
 
 if __name__ == "__main__":
