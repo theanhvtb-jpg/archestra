@@ -16,9 +16,12 @@ import argparse, json, os, sys, urllib.request, urllib.error
 
 # Cấp trên -> danh sách cấp dưới trực tiếp.
 ORG = {
+    # Tuân thủ báo cáo THẲNG lên CEO, không qua giám đốc nào.
+    # Quan trọng: không được đặt dưới GD San xuat — người lo tiến độ
+    # không được quyền trên người lo rủi ro mất kênh.
     "CEO Agent Media": [
-        "GD Noi dung", "GD San xuat", "GD Tang truong",
-        "GD Tuan thu", "Giam doc Tai chinh",
+        "GD Noi dung", "GD San xuat", "GD Tang truong", "Giam doc Tai chinh",
+        "Phong Ban quyen & Chinh sach", "Phong Tai san so",
     ],
     "GD Noi dung": [
         "Phong Nghien cuu & Y tuong", "Phong Packaging",
@@ -28,7 +31,6 @@ ORG = {
         "Phong Hau ky", "Phong Tai su dung & Phan phoi", "Phong Xuat ban & Toi uu",
     ],
     "GD Tang truong": ["Phong Phan tich", "Phong Cong dong"],
-    "GD Tuan thu": ["Phong Ban quyen & Chinh sach", "Phong Tai san so"],
     "Giam doc Tai chinh": [],
 }
 
