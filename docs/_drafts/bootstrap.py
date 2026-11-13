@@ -84,6 +84,30 @@ def list_names(base, key, path, page_size=100):
         offset += page_size
 
 
+def _server_up(base):  # SERVER_PROBE_MARKER
+    """Phân biệt 'server chưa chạy' với 'sai mật khẩu' — hai lỗi cần cách sửa khác nhau."""
+    import urllib.request as _u, urllib.error as _e
+    try:
+        _u.urlopen(_u.Request(base.rstrip("/") + "/api/agents"), timeout=8)
+        return True
+    except _e.HTTPError:
+        return True          # có trả lời (401 chẳng hạn) -> server sống
+    except Exception:
+        return False
+
+
+def _die_server_down(base):
+    import sys as _s
+    _s.exit(f"Không kết nối được tới Archestra ở {base}\n\n"
+            "  Archestra chưa chạy. Khởi động lại:\n"
+            "    docker start archestra\n\n"
+            "  Nếu báo không tìm thấy container, mở Docker Desktop trước\n"
+            "  (chờ biểu tượng cá voi đứng yên trên thanh menu), rồi chạy lại.\n\n"
+            "  Kiểm tra khi nào sẵn sàng:\n"
+            "    curl -s -o /dev/null -w \"%{http_code}\\n\" http://localhost:9000/api/agents\n"
+            "    (ra 401 là sẵn sàng)")
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--base-url", default="http://localhost:9000")
@@ -92,6 +116,8 @@ def main():
     p.add_argument("--apply", action="store_true")
     a = p.parse_args()
     B = a.base_url
+    if not _server_up(B):
+        _die_server_down(B)
     DRY = not a.apply
 
     print("=" * 62)
