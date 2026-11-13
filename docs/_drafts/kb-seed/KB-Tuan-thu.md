@@ -20,7 +20,27 @@ là khi sao chép *cách diễn đạt* của họ, hoặc dùng *tư liệu* c�
 
 ---
 
-## 2. Nguồn tư liệu được phép
+## 2. NGUỒN ĐÃ DUYỆT SẴN — đọc mục này trước
+
+Tư liệu nằm trong danh sách này **không cần rà từng lần**. Agent đi đường nhanh và kết luận
+ĐẠT ngay. Điền càng đầy đủ, càng ít bị hỏi lại.
+
+### Luôn được dùng
+- Tư liệu công ty tự tạo: tự quay, tự vẽ, tự dựng đồ hoạ, ảnh tự chụp
+- Giọng đọc của công ty, nhạc tự làm
+- {ĐIỀN — ví dụ: ảnh Thư viện Quốc hội Mỹ, tư liệu chính phủ Mỹ trước 1929, Wikimedia Commons có ghi nguồn}
+
+### Nhà cung cấp đã mua giấy phép
+| Nhà cung cấp | Loại | Hạn | Dùng được ở đâu |
+|---|---|---|---|
+| {ĐIỀN} | nhạc | {ĐIỀN} | YouTube ☐  Facebook ☐ |
+| {ĐIỀN} | video/ảnh | {ĐIỀN} | YouTube ☐  Facebook ☐ |
+
+> **Tick riêng từng nền tảng.** Giấy phép YouTube không mặc nhiên dùng được trên Facebook.
+
+---
+
+## 2b. Nguồn tư liệu được phép (chi tiết)
 
 ### Đã duyệt — dùng tự do
 - Tư liệu do công ty tự tạo: quay, vẽ, dựng đồ hoạ, ảnh chụp
