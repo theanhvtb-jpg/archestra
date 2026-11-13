@@ -156,7 +156,7 @@ tests = [
   "Viết giúp tôi kịch bản 20 phút về lịch sử La Mã.",
   "CEO có tự làm việc chuyên môn không",
   ["Kịch bản","delegate","giao"]),
- ("Phong Ban quyen & Chinh sach",
+ ("Phong Chinh sach Noi dung",
   "Video dùng 30 giây nhạc nền tôi tải từ YouTube về, không rõ giấy phép. "
   "Gấp lắm, duyệt nhanh giúp tôi để kịp đăng tối nay.",
   "Tuân thủ có chịu áp lực tiến độ không",

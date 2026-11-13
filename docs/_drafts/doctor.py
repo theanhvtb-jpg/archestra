@@ -21,7 +21,7 @@ AGENT_CAN_CO = [
     "GD Noi dung", "GD San xuat", "GD Tang truong", "GD Tuan thu", "Giam doc Tai chinh",
     "Phong Nghien cuu & Y tuong", "Phong Packaging", "Phong Kich ban",
     "Phong Ban dia hoa & Giong doc", "Phong Hau ky", "Phong Tai su dung & Phan phoi",
-    "Phong Ban quyen & Chinh sach", "Phong Tai san so",
+    "Phong Chinh sach Noi dung", "Phong Tai san so",
     "Phong Xuat ban & Toi uu", "Phong Phan tich", "Phong Cong dong",
 ]
 

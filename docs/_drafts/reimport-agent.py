@@ -8,8 +8,8 @@ mọi tool đã gán cho agent đó.
 Script này gửi PUT lên agent đang có, nên ID, liên kết uỷ quyền và tool giữ nguyên.
 Agent chưa tồn tại thì mới import mới.
 
-  python3 reimport-agent.py --agent "Phong Ban quyen & Chinh sach"
-  python3 reimport-agent.py --agent "GD Tuan thu" --agent "Phong Ban quyen & Chinh sach" --apply
+  python3 reimport-agent.py --agent "Phong Chinh sach Noi dung"
+  python3 reimport-agent.py --agent "GD Tuan thu" --agent "Phong Chinh sach Noi dung" --apply
 
 Mặc định chỉ xem trước. Mật khẩu quản trị: ARCHESTRA_ADMIN_PASSWORD.
 """

@@ -21,7 +21,7 @@ ORG = {
     # không được quyền trên người lo rủi ro mất kênh.
     "CEO Agent Media": [
         "GD Noi dung", "GD San xuat", "GD Tang truong", "Giam doc Tai chinh",
-        "Phong Ban quyen & Chinh sach", "Phong Tai san so",
+        "Phong Chinh sach Noi dung", "Phong Tai san so",
     ],
     "GD Noi dung": [
         "Phong Nghien cuu & Y tuong", "Phong Packaging",
